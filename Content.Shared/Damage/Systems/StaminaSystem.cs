@@ -185,14 +185,8 @@ public sealed partial class StaminaSystem : EntitySystem
         var stamQuery = GetEntityQuery<StaminaComponent>();
         var toHit = new List<(EntityUid Entity, StaminaComponent Component)>();
 
-        // Split stamina damage between all eligible targets.
-        foreach (var ent in args.HitEntities)
-        {
-            if (!stamQuery.TryGetComponent(ent, out var stam))
-                continue;
-
-            toHit.Add((ent, stam));
-        }
+        if (stamQuery.TryGetComponent(args.HitEntities[0], out var stam))
+            toHit.Add((args.HitEntities[0], stam));
 
         var hitEvent = new StaminaMeleeHitEvent(toHit);
         RaiseLocalEvent(uid, hitEvent);
