@@ -199,6 +199,6 @@
     size: 10
     sprite: Objects/Weapons/Melee/e_sword_double.rsi
   - type: Reflect
-    enabled: true
+    enabled: false
     reflectProb: .75
     spread: 75

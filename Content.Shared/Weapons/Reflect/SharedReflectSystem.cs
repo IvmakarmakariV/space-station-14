@@ -177,7 +177,7 @@ public abstract class SharedReflectSystem : EntitySystem
         if (args.Slot == "pocket1" || args.Slot == "pocket2")
             return;
 
-        reflection.Enabled = comp.Enabled;
+        reflection.Enabled = false;
         // reflection probability should be: (1 - old probability) * newly-equipped item probability + old probability
         // example: if entity has .25 reflection and newly-equipped item has .7, entity should have (1 - .25) * .7 + .25 = .775
         reflection.ReflectProb += (1 - reflection.ReflectProb) * comp.ReflectProb;
@@ -193,10 +193,12 @@ public abstract class SharedReflectSystem : EntitySystem
         if (!_inventorySystem.TryGetSlots(args.Equipee, out var slotDef))
             return;
 
+        if (!TryComp(args.Equipment, out ReflectComponent? reflectionEquipment))
+            return;
+
         // you could recalculate reflectprob with new = (old - component) / (1 - component), but component=1 introduces loss
         // still need to either maintain a counter or loop through all slots to determine reflection.enabled anyway?
         float newProb = 1;
-        var reflecting = false;
 
         foreach (var slot in slotDef)
         {
@@ -206,12 +208,11 @@ public abstract class SharedReflectSystem : EntitySystem
             if (!TryComp(slotEnt, out ReflectComponent? refcomp))
                 continue;
 
-            reflecting = true;
             var prob = refcomp.ReflectProb;
             newProb -= newProb * prob;
         }
 
         reflection.ReflectProb = 1 - newProb;
-        reflection.Enabled = reflecting;
+        reflection.Enabled = reflectionEquipment.Enabled;
     }
 }
